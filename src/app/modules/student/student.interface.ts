@@ -1,4 +1,6 @@
-export type Gurdian = {
+import { Model, Types } from "mongoose";
+
+export type TGurdian = {
   fatherName: string;
   fatherOccupation: string;
   fatherContactNo: string;
@@ -6,30 +8,37 @@ export type Gurdian = {
   motherOccupation: string;
   motherContactNo: string;
 };
-export type UserName = {
+export type TUserName = {
   firstName: string;
   middleName: string;
   lastName: string;
 };
-export type LocalGurdian = {
+export type TLocalGurdian = {
   name: string;
   occupation: string;
   contactNo: string;
   address: string;
 };
-export type Student = {
+export type TStudent = {
   id: string;
-  name: UserName;
-  gender: "male" | "female";
-  dateOfBirth?: string;
+  user: Types.ObjectId;
+  password: string;
+  name: TUserName;
+  gender: "male" | "female" | "other";
+  dateOfBirth?: Date;
   email: string;
   contactNo: string;
   emergencyContactNo: string;
   blodGroup?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
   presentAddress: string;
   permenantAddress: string;
-  gurdian: Gurdian;
-  localGurdian: LocalGurdian;
+  gurdian: TGurdian;
+  localGurdian: TLocalGurdian;
   profileImg?: string;
-  isActive: "active" | "blocked";
+  admissionSemester: Types.ObjectId;
+  isDeleted: boolean;
 };
+
+export interface StudentModel extends Model<TStudent> {
+  isUserExits(id: string): Promise<TStudent | null>;
+}
