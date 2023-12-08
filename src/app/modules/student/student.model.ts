@@ -152,22 +152,26 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     },
     admissionSemester: {
       type: Schema.Types.ObjectId,
-      ref: 'AcademicSemester'
+      ref: "AcademicSemester",
+    },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: "AcademicDepartment",
     },
     isDeleted: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   {
     toJSON: {
       virtuals: true,
     },
-  },
+  }
 );
 
 studentSchema.virtual("fullName").get(function () {
-  return `${this.name.firstName}  ${this.name.middleName}  ${this.name.lastName}`;
+  return `${this?.name?.firstName}  ${this?.name?.middleName}  ${this?.name?.lastName}`;
 });
 
 studentSchema.pre("find", function (next) {
