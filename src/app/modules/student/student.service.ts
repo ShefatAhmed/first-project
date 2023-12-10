@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Student } from "./student.model";
-import AppError from "../../error/AppError";
+import AppError from "../../errors/AppError";
 import { User } from "../user/user.model";
 import httpStatus from "http-status";
 import { TStudent } from "./student.interface";
@@ -81,7 +81,7 @@ const deleteStudentsFromDB = async (id: string) => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    const deleteStudent = await Student.findOneAndUpdate(
+    const deleteStudent = await Student.findByIdAndUpdate(
       { id },
       { isDeleted: true },
       { new: true, session }
@@ -89,8 +89,9 @@ const deleteStudentsFromDB = async (id: string) => {
     if (!deleteStudent) {
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to delete student");
     }
-    const deleteUser = await User.findOneAndUpdate(
-      { id },
+    const userId = deleteStudent.user;
+    const deleteUser = await User.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       { new: true, session }
     );
@@ -107,7 +108,7 @@ const deleteStudentsFromDB = async (id: string) => {
   }
 };
 const getSingleStudentFromDB = async (id: string) => {
-  const result = await Student.findOne({ id })
+  const result = await Student.findById(id)
     .populate("admissionSemester")
     .populate({
       path: "academicDepartment",
@@ -137,7 +138,7 @@ const updateStudentFromDB = async (id: string, payload: Partial<TStudent>) => {
       modifiedUpdatedData[`localGurdian.${key}`] = value;
     }
   }
-  const result = await Student.findOneAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Student.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
